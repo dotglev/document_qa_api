@@ -245,8 +245,8 @@ print("""
 ║  When a user asks a question, the system finds the most         ║
 ║  relevant chunks and sends them to an AI (Qwen) to              ║
 ║  generate a precise, document-grounded answer.                  ║
-║                                                                  ║
-║  THE TECH STACK:                                                 ║
+║                                                                 ║
+║  THE TECH STACK:                                                ║
 ║  → FastAPI         (REST API framework)                         ║
 ║  → PyMuPDF         (PDF text extraction)                        ║
 ║  → sentence-transformers (local embeddings, no GPU)             ║
