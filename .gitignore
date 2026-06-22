@@ -3,3 +3,7 @@ venv/
 __pycache__/
 *.pycchroma_storage/
 chroma_storage/
+embedder.py
+upload.py
+vector_store.py
+response.json
