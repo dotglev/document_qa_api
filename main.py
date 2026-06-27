@@ -1,11 +1,15 @@
 from fastapi import FastAPI
-from routers import upload, query
+from routers import upload, query, users
+from models.database import engine, Base
 
-app = FastAPI(title="RAG Document Q&A API")
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Enterprise RAG Knowledge Intelligence Platform")
 
 app.include_router(upload.router)
 app.include_router(query.router)
+app.include_router(users.router)
 
 @app.get("/")
 def home():
-    return {"status": "RAG Document Q&A API is running"}
+    return {"status": "Enterprise RAG API is running"}
