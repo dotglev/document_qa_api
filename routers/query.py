@@ -45,3 +45,24 @@ async def query_document_stream(
             yield token
 
     return StreamingResponse(generate(), media_type="text/plain")
+
+@router.post("/query/agent")
+async def query_document_agent(
+    request: QueryRequest,
+    current_user=Depends(get_current_user)
+):
+    from services.query_agent import agentic_retrieve
+    from services.llm import get_answer_with_citations
+
+    result = agentic_retrieve(request.document_id, request.question)
+    chunks = result["chunks"]
+    answer = get_answer_with_citations(request.question, chunks)
+
+    return {
+        "question": request.question,
+        "answer": answer["answer"],
+        "citations": answer["citations"],
+        "agent_plan": result["plan"],
+        "sufficient_context": result["sufficient"],
+        "total_chunks_searched": result["total_chunks_found"]
+    }
