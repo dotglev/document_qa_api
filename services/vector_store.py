@@ -52,3 +52,15 @@ def search_with_citations(document_id: str, question_embedding: list, top_n: int
             "relevance_score": round(1 - distance, 3)
         })
     return chunks
+
+def get_all_chunks(document_id: str) -> list:
+    collection = get_collection(document_id)
+    results = collection.get(include=["documents", "metadatas"])
+    chunks = []
+    for i, doc in enumerate(results["documents"]):
+        metadata = results["metadatas"][i]
+        chunks.append({
+            "text": doc,
+            "page": metadata.get("page", "unknown")
+        })
+    return chunks

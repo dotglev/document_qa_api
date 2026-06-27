@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from routers.users import get_current_user
-from services.embedder import create_embeddings
-from services.vector_store import search_with_citations
+from services.vector_store import get_all_chunks
+from services.hybrid_search import hybrid_search
 from services.llm import get_answer_with_citations
 
 router = APIRouter()
@@ -10,17 +10,19 @@ router = APIRouter()
 class QueryRequest(BaseModel):
     document_id: str
     question: str
+    search_type: str = "hybrid"
 
 @router.post("/query")
 async def query_document(
     request: QueryRequest,
     current_user=Depends(get_current_user)
 ):
-    question_embedding = create_embeddings([request.question])[0]
-    chunks = search_with_citations(request.document_id, question_embedding)
+    all_chunks = get_all_chunks(request.document_id)
+    chunks = hybrid_search(request.document_id, request.question, all_chunks)
     result = get_answer_with_citations(request.question, chunks)
     return {
         "question": request.question,
         "answer": result["answer"],
-        "citations": result["citations"]
+        "citations": result["citations"],
+        "search_type": request.search_type
     }
