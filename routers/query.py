@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from routers.auth import verify_api_key
+from routers.users import get_current_user
 from services.embedder import create_embeddings
-from services.vector_store import search_similar_chunks
-from services.llm import get_answer
+from services.vector_store import search_with_citations
+from services.llm import get_answer_with_citations
 
 router = APIRouter()
 
@@ -14,13 +14,13 @@ class QueryRequest(BaseModel):
 @router.post("/query")
 async def query_document(
     request: QueryRequest,
-    api_key: str = Depends(verify_api_key)
+    current_user=Depends(get_current_user)
 ):
     question_embedding = create_embeddings([request.question])[0]
-    chunks = search_similar_chunks(request.document_id, question_embedding)
-    answer = get_answer(request.question, chunks)
+    chunks = search_with_citations(request.document_id, question_embedding)
+    result = get_answer_with_citations(request.question, chunks)
     return {
         "question": request.question,
-        "answer": answer,
-        "source_chunks": chunks
+        "answer": result["answer"],
+        "citations": result["citations"]
     }
